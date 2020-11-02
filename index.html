@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<head>
+    <title>Descriptor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="main.css">
+    <script src="scraper.js"></script>
+    <script src="frontendHandler.js"></script>
+</head>
+<body>
+    <p>
+        <h1 class="text-center"><b>DESCRIPTOR</b></h1>
+        <h6 class="text-center text-muted">Because creating descriptions manually sucks.</h6>
+    </p>
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col-sm">
+                <h5>Description</h5>
+            </div>
+            <div class="col-sm">
+                <h5 class="text-right">Artists</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <div class="mb-2">
+                    <label>Title</label>
+                    <input class="form-control" id="title"></textarea>
+                </div>
+                <div class="mb-2">
+                    <label>Header</label>
+                    <input class="form-control" id="header"></textarea>
+                </div>
+                <div class="mb-2">
+                    <label>Artist Header</label>
+                    <input class="form-control" id="artist-header"></textarea>
+                </div>
+                <div class="mb-2">
+                    <label>Self-Description</label>
+                    <input class="form-control" id="self-description"></textarea>
+                </div>
+                <div class="mb-2">
+                    <label>Wallpaper</label>
+                    <input class="form-control" id="wallpaper"></textarea>
+                </div>
+            </div>
+            <div class="col-sm">
+                <div id="artists">
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-outline-success btn-sm text-center" onclick="addArtistField()">+</button>
+                    <button class="btn btn-outline-danger btn-sm text-center" onclick="removeArtistField()">-</button>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="section-process">
+            <div class="col-sm">
+                <button class="btn btn-primary btn-lg btn-block" onclick="process()">Process</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <textarea class="form-control mt-3" rows=10 id="textarea"></textarea>
+            </div>
+        </div>
+    </div>
+</body>
