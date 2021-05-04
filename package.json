@@ -1,0 +1,17 @@
+{
+  "name": "descriptor",
+  "version": "1.0.0",
+  "main": "server.js",
+  "dependencies": {
+    "cors-anywhere": "^0.4.3",
+    "jquery": "^3.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

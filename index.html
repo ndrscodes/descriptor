@@ -4,15 +4,40 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+    <script src="http://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="main.css">
     <script src="scraper.js"></script>
     <script src="frontendHandler.js"></script>
 </head>
 <body>
+    <script src="defaultHandler.js">
+        foo();
+    </script>
     <p>
         <h1 class="text-center"><b>DESCRIPTOR</b></h1>
         <h6 class="text-center text-muted">Because creating descriptions manually sucks.</h6>
     </p>
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col-sm">
+                <button class="btn btn-primary btn-lg btn-block" onclick="loadDefaults('CookieMusicNetwork')">CookieMusicNetwork</button>
+            </div>
+            <div class="col-sm">
+                <button class="btn btn-primary btn-lg btn-block" onclick="loadDefaults('JompaMusic')">JompaMusic</button>
+            </div>
+            <div class="col-sm">
+                <button class="btn btn-primary btn-lg btn-block" onclick="loadDefaults('')">Clear</button>
+            </div>
+        </div>
+        <hr/>
+        <div class="row" id="section-autofill">
+            <div class="col-sm">
+                <input  class="form-control" id="song-link" placeholder="Song Link" pattern="$https?:\/\/soundcloud.com\/\S+^"></input>
+                <button class="btn btn-primary btn-lg btn-block" onclick="autoFill()">Autofill</button>
+            </div>
+        </div>
+        <hr/>
+    </div>
     <div class="container">
         <div class="row mb-3">
             <div class="col-sm">
@@ -22,35 +47,59 @@
                 <h5 class="text-right">Artists</h5>
             </div>
         </div>
+    </div>
+    <div class="container">
         <div class="row">
-            <div class="col-sm">
+            <div class="col-sm" id="info-source">
                 <div class="mb-2">
-                    <label>Title</label>
-                    <input class="form-control" id="title"></textarea>
+                    <label>Line Prefix</label>
+                    <input class="form-control" id="line-prefix"></input>
                 </div>
                 <div class="mb-2">
-                    <label>Header</label>
-                    <input class="form-control" id="header"></textarea>
+                    <label>Title</label>
+                    <input class="form-control" id="title"></input>
+                </div>
+                <div class="mb-2">
+                    <label>Header decoration</label>
+                    <input class="form-control" id="decoration"></input>
+                </div>
+                <div class="mb-2">
+                    <label>Additional Info</label>
+                    <textarea class="form-control" id="additional-info-top"></textarea>
+                </div>
+                <div class="mb-2">
+                    <label>Download</label>
+                    <input class="form-control" id="download-header"></input>
+                </div>
+                <div class="mb-2">
+                    <label>Download Link</label>
+                    <input class="form-control" id="download-link"></input>
                 </div>
                 <div class="mb-2">
                     <label>Artist Header</label>
-                    <input class="form-control" id="artist-header"></textarea>
+                    <input class="form-control" id="artist-header"></input>
                 </div>
                 <div class="mb-2">
                     <label>Self-Description</label>
-                    <input class="form-control" id="self-description"></textarea>
+                    <textarea class="form-control" id="self-description"></textarea>
+                </div>
+                <div class="mb-2">
+                    <label>Wallpaper Text</label>
+                    <input class="form-control" id="wallpaper-header"></input>
                 </div>
                 <div class="mb-2">
                     <label>Wallpaper</label>
-                    <input class="form-control" id="wallpaper"></textarea>
+                    <input class="form-control" id="wallpaper-link"></input>
                 </div>
             </div>
             <div class="col-sm">
-                <div id="artists">
-                </div>
-                <div class="text-center">
-                    <button class="btn btn-outline-success btn-sm text-center" onclick="addArtistField()">+</button>
-                    <button class="btn btn-outline-danger btn-sm text-center" onclick="removeArtistField()">-</button>
+                <div id='artist-control'>
+                    <div id="artists">
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-outline-success btn-sm text-center" onclick="addArtistField()">+</button>
+                        <button class="btn btn-outline-danger btn-sm text-center" onclick="removeArtistField()">-</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -58,7 +107,13 @@
             <div class="col-sm">
                 <button class="btn btn-primary btn-lg btn-block" onclick="process()">Process</button>
             </div>
+            <div class="progress">
         </div>
+  </div>
+  <div id="progress" style="background-color: #C0C0C0">
+          <div id="process-progress" class="progress-bar progress-bar-striped active" role="progressbar" style="width:0%">0%
+            </div>
+</div>
         <div class="row">
             <div class="col-sm">
                 <textarea class="form-control mt-3" rows=10 id="textarea"></textarea>

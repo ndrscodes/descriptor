@@ -1,7 +1,8 @@
 let personalNetworkDeclaration = "personal"
+let itemScraper = new scraper();
 
 //TODO: Parse Domain einbinden
-let artistCount = 1;
+let artistCount = 0;
 let artistBlock = document.getElementById("artists");
 document.onreadystatechange = function(){
     if(document.readyState == "complete"){
@@ -9,32 +10,86 @@ document.onreadystatechange = function(){
     }
 }
 
+function loadDefaults(channel){
+    let inputs = document.getElementsByTagName("input");
+    for(let i = 0; i < inputs.length; i++){
+        inputs[i].value = "";
+    }
+    inputs = document.getElementsByTagName("textarea");
+    for(let i = 0; i < inputs.length; i++){
+        inputs[i].value = "";
+    }
+    if(channel === "CookieMusicNetwork"){
+        displayDefaults(loadCmn());
+        return;
+    }
+    if(channel === "JompaMusic"){
+        displayDefaults(loadJ());
+        return;
+    }
+}
+
+function displayDefaults(map){
+    map.forEach((value, key) => {
+        console.log(document.getElementById(key));
+        document.getElementById(key).value = value;
+    });
+}
+
 async function process(){
     let textArea = document.getElementById("textarea");
     let textElement = "";
-    for(let i = 1; i < artistCount; i++){
+    textElement += getHeader() + "\r\n" + "\r\n";
+    textElement += getAdditionalInfoTop() + "\r\n";
+    textElement += getDownloadLink() + "\r\n" + "\r\n";
+    for(let i = 0; i < artistCount; i++){
         console.log("executing " + i);
         textElement += await getArtistBlock(i);
         textElement += "\r\n";
+        updateProgressBar(i/artistCount * 100);
     }
+    textElement += getSelfDescription() + "\r\n" + "\r\n";
+    textElement += getWallpaperLink();
     textArea.value = textElement;
+}
+
+function getSectionPrefix(){
+    return document.getElementById("line-prefix").value;
+}
+
+function updateProgressBar(progress){
+    console.log("progress", progress);
+  if (progress == 0) {
+    progress = 1;
+    var elem = document.getElementById("process-progress");
+    var width = 10;
+    var id = setInterval(frame, 10);
+    function frame() {
+      if (width >= 100) {
+        clearInterval(id);
+        progress = 0;
+      } else {
+        width++;
+        elem.style.width = width + "%";
+        elem.innerHTML = width + "%";
+      }
+    }
+  }
 }
 
 async function getArtistBlock(artistId){
     let displayHelper = new displayHandler();
     let artistUrl = document.getElementById("artist-"+artistId).value;
     console.log(artistUrl);
-    let foo = new scraper(artistUrl);
     let artistHeader = document.getElementById("artist-header").value;
-    let artistName = await foo.getDisplayName();
+    let artistName = await itemScraper.getDisplayName(artistUrl);
     console.log("Artistname: " + artistName);
-    let scrapedItems = await foo.crawl();
-    let result = artistHeader.toLowerCase().replace("$artist_name", artistName);
+    let scrapedItems = await itemScraper.crawl(artistUrl);
+    let result = artistHeader.replace("$artist_name", artistName);
     result += "\r\n";
     result += "Soundcloud: " + artistUrl + "\r\n";
     scrapedItems.forEach(element => {
         console.log(element.network);
-        //textElement += String.fromCodePoint(0x2794);
         if(element.network === personalNetworkDeclaration){
             result += displayHelper.handlePersonalNetwork(element.url);
         }
@@ -45,8 +100,65 @@ async function getArtistBlock(artistId){
         result += element.url;
         result += "\r\n";
     });
-    result = displayHelper.runReplacements(result);
+    result = getSectionPrefix() + displayHelper.runReplacements(result);
     return result;
+}
+
+async function autoFill(){
+    let url = getSongUrl();
+    let artistLinks = await itemScraper.getArtistLinks(url);
+    console.log(artistLinks);
+    for(let i = 0; i < (await artistLinks).length; i++){
+        if(i >= artistCount){
+            addArtistField();
+        }
+        getArtistField(i).value = artistLinks[i];
+    }
+    setTitle(await itemScraper.getSongTitle(url));
+    setDownloadLink(await itemScraper.getDownloadLink(url));
+}
+
+function getArtistField(id){
+    return document.getElementById("artist-" + id);
+}
+
+function setDownloadLink(link){
+    document.getElementById("download-link").value = link;
+}
+
+function getSongUrl(){
+    console.log(document.getElementById("song-link").value);
+    return document.getElementById("song-link").value;
+}
+
+function setTitle(title){
+    document.getElementById("title").value = title;
+}
+
+function getHeader(){
+    let title = document.getElementById("title").value;
+    let decoration = document.getElementById("decoration").value;
+    return decoration + " " + title + " " + decoration;
+}
+
+function getDownloadLink(){
+    let downloadLinkHeader = document.getElementById("download-header").value;
+    let downloadLink = document.getElementById("download-link").value;
+    return getSectionPrefix() + downloadLinkHeader + " " + downloadLink;
+}
+
+function getSelfDescription(){
+    return getSectionPrefix() + document.getElementById("self-description").value;
+}
+
+function getWallpaperLink(){
+    let wallpaperLinkHeader = document.getElementById("wallpaper-header").value;
+    let wallpaperLink = document.getElementById("wallpaper-link").value;
+    return getSectionPrefix() + wallpaperLinkHeader + " " + wallpaperLink;
+}
+
+function getAdditionalInfoTop(){
+    return getSectionPrefix() + document.getElementById("additional-info-top").value;
 }
 
 function addArtistField(){
@@ -62,16 +174,61 @@ function removeArtistField(){
 
 function createArtistFieldNode(){
     let container = document.createElement("div");
+    let form = document.createElement("div");
+    form.setAttribute("class", "d-flex flex-row mb-2");
     let documentNode = document.createElement("input");
-    documentNode.setAttribute("class", "form-control mb-2");
+    let br = document.createElement("br");
+    documentNode.setAttribute("class", "form-control movable-content");
     documentNode.setAttribute("id", "artist-" + artistCount);
     let label = document.createElement("label");
     label.innerHTML = "Artist " + artistCount
     container.appendChild(label);
-    container.appendChild(documentNode);
+    let upwardBtn = document.createElement("button");
+    upwardBtn.setAttribute("class", "btn btn-sm text-right btn-outline-success");
+    upwardBtn.textContent = "up"
+    upwardBtn.setAttribute("onclick", "switchTextFieldValue(this, \"up\")");
+    let downwardBtn = document.createElement("button");
+    downwardBtn.setAttribute("class", "btn btn-sm text-right btn-outline-success");
+    downwardBtn.textContent = "down"
+    downwardBtn.setAttribute("onclick", "switchTextFieldValue(this, \"down\")");
+    console.log(upwardBtn);
+    form.appendChild(documentNode);
+    form.appendChild(upwardBtn);
+    form.appendChild(downwardBtn);
+    container.appendChild(form);
     artistCount++;
     console.log(container);
     return container;
+}
+
+function switchTextFieldValue(element, direction){
+    if(direction === "down"){
+        let input = element.previousSibling.previousSibling;
+        if(!input.classList.contains("movable-content")){
+            console.error("not movable");
+            return;
+        }
+        if(input.parentElement.parentElement.nextElementSibling){
+            let target = element.parentElement.parentElement.nextSibling.childNodes[1].childNodes[0];
+            let previousValue = target.value
+            target.value = input.value
+            input.value = previousValue;
+        }
+    }
+    if(direction === "up"){
+        let input = element.previousSibling;
+        if(!input.classList.contains("movable-content")){
+            console.error("not movable");
+            return;
+        }
+        if(input.parentElement.parentElement.previousElementSibling){
+            console.log(input.parentElement.parentElement.previousSibling);
+            let target = element.parentElement.parentElement.previousSibling.childNodes[1].childNodes[0];
+            let previousValue = target.value
+            target.value = input.value
+            input.value = previousValue;
+        }
+    }
 }
 
 class displayHandler{

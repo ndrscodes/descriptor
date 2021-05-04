@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<channels>
+    <channel name="CookieMusicNetwork">
+        <attribute name="decoration">💓</attribute>
+        <attribute name="download-header">FREE DOWNLOAD + STREAM:</attribute>
+        <attribute name="artist-header">Follow $artist_name:</attribute>
+        <attribute name="self-description">Follow CookieMusicNetwork:&#xA;
+Soundcloud: https://soundcloud.com/cookiemusicnetwork&#xA;
+Facebook: https://www.facebook.com/cookiemusicnetwork&#xA;
+Plug.dj: http://plug.dj/electro-and-chill-room/&#xA;
+Twitch: https://twitch.tv/cookiemusicnetwork&#xA;
+
+Want your track uploaded?&#xA;
+Send your song to our email: cookiemusicnetwork@gmail.com&#xA;
+
+If any producer/label/artist has an issue with this Music Video or the picture used in it, please contact us and we will delete it immediately.&#xA;
+</attribute>
+        <attribute name="wallpaper-header">Picture URL:</attribute>
+    </channel>
+
+    <channel name="CookieMusicNetwork">
+        <attribute name="decoration">➞</attribute>
+        <attribute name="download-header">Free Download:</attribute>
+        <attribute name="artist-header">$artist_name:</attribute>
+        <attribute name="self-description">
+</attribute>
+        <attribute name="wallpaper-header">Picture URL ᕕ( ᐛ )ᕗ:</attribute>
+    </channel>
+</channels>
