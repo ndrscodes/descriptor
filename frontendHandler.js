@@ -37,6 +37,7 @@ function displayDefaults(map){
 }
 
 async function process(){
+    resetProgressBar();
     let textArea = document.getElementById("textarea");
     let textElement = "";
     textElement += getHeader() + "\r\n" + "\r\n";
@@ -46,50 +47,49 @@ async function process(){
         console.log("executing " + i);
         textElement += await getArtistBlock(i);
         textElement += "\r\n";
-        updateProgressBar(i/artistCount * 100);
+        updateProgressBar((i + 1)/(artistCount + 1) * 100);
     }
     textElement += getSelfDescription() + "\r\n" + "\r\n";
     textElement += getWallpaperLink();
     textArea.value = textElement;
+    document.getElementById("tags").value = await processTags();
+    updateProgressBar(100);
 }
 
 function getSectionPrefix(){
     return document.getElementById("line-prefix").value;
 }
 
+function resetProgressBar(){
+    width = 0;
+    updateProgressBar(0);
+}
+
+let width = 0;
 function updateProgressBar(progress){
-    console.log("progress", progress);
-  if (progress == 0) {
-    progress = 1;
     var elem = document.getElementById("process-progress");
-    var width = 10;
     var id = setInterval(frame, 10);
     function frame() {
-      if (width >= 100) {
+      if (width >= progress) {
         clearInterval(id);
-        progress = 0;
       } else {
         width++;
         elem.style.width = width + "%";
         elem.innerHTML = width + "%";
       }
     }
-  }
 }
 
 async function getArtistBlock(artistId){
     let displayHelper = new displayHandler();
     let artistUrl = document.getElementById("artist-"+artistId).value;
-    console.log(artistUrl);
     let artistHeader = document.getElementById("artist-header").value;
     let artistName = await itemScraper.getDisplayName(artistUrl);
-    console.log("Artistname: " + artistName);
     let scrapedItems = await itemScraper.crawl(artistUrl);
     let result = artistHeader.replace("$artist_name", artistName);
     result += "\r\n";
     result += "Soundcloud: " + artistUrl + "\r\n";
     scrapedItems.forEach(element => {
-        console.log(element.network);
         if(element.network === personalNetworkDeclaration){
             result += displayHelper.handlePersonalNetwork(element.url);
         }
@@ -107,7 +107,6 @@ async function getArtistBlock(artistId){
 async function autoFill(){
     let url = getSongUrl();
     let artistLinks = await itemScraper.getArtistLinks(url);
-    console.log(artistLinks);
     for(let i = 0; i < (await artistLinks).length; i++){
         if(i >= artistCount){
             addArtistField();
@@ -127,12 +126,15 @@ function setDownloadLink(link){
 }
 
 function getSongUrl(){
-    console.log(document.getElementById("song-link").value);
     return document.getElementById("song-link").value;
 }
 
 function setTitle(title){
     document.getElementById("title").value = title;
+}
+
+function getTitle(){
+    return document.getElementById("title").value;
 }
 
 function getHeader(){
@@ -174,61 +176,81 @@ function removeArtistField(){
 
 function createArtistFieldNode(){
     let container = document.createElement("div");
+
     let form = document.createElement("div");
     form.setAttribute("class", "d-flex flex-row mb-2");
+
     let documentNode = document.createElement("input");
-    let br = document.createElement("br");
     documentNode.setAttribute("class", "form-control movable-content");
     documentNode.setAttribute("id", "artist-" + artistCount);
+
     let label = document.createElement("label");
     label.innerHTML = "Artist " + artistCount
-    container.appendChild(label);
+
     let upwardBtn = document.createElement("button");
     upwardBtn.setAttribute("class", "btn btn-sm text-right btn-outline-success");
     upwardBtn.textContent = "up"
-    upwardBtn.setAttribute("onclick", "switchTextFieldValue(this, \"up\")");
+    upwardBtn.setAttribute("onclick", "switchTextFieldValue(this.previousSibling, \"up\")");
+    
     let downwardBtn = document.createElement("button");
     downwardBtn.setAttribute("class", "btn btn-sm text-right btn-outline-success");
     downwardBtn.textContent = "down"
-    downwardBtn.setAttribute("onclick", "switchTextFieldValue(this, \"down\")");
-    console.log(upwardBtn);
+    downwardBtn.setAttribute("onclick", "switchTextFieldValue(this.previousSibling.previousSibling, \"down\")");
+    
+    let removeBtn = document.createElement("button");
+    removeBtn.setAttribute("class", "btn btn-sm text-right btn-outline-danger");
+    removeBtn.textContent = "delete"
+    removeBtn.setAttribute("onclick", "remove(this.previousSibling.previousSibling.previousSibling)");
+    
     form.appendChild(documentNode);
     form.appendChild(upwardBtn);
     form.appendChild(downwardBtn);
+    form.appendChild(removeBtn);
+    
+    container.appendChild(label);
     container.appendChild(form);
+
     artistCount++;
-    console.log(container);
+
     return container;
 }
 
+function remove(element){
+    let res;
+    if(element !== undefined && element !== null && (res = switchTextFieldValue(element, "down")) !== undefined){
+        remove(res);
+    }
+    else{
+        removeArtistField();
+    }
+}
+
 function switchTextFieldValue(element, direction){
+    let input = element;
+    let target;
+    if(!input.classList.contains("movable-content")){
+        console.error("not movable");
+        return null;
+    }
     if(direction === "down"){
-        let input = element.previousSibling.previousSibling;
-        if(!input.classList.contains("movable-content")){
-            console.error("not movable");
-            return;
-        }
-        if(input.parentElement.parentElement.nextElementSibling){
-            let target = element.parentElement.parentElement.nextSibling.childNodes[1].childNodes[0];
-            let previousValue = target.value
-            target.value = input.value
-            input.value = previousValue;
-        }
+        target = element?.parentElement?.parentElement?.nextSibling?.childNodes[1]?.childNodes[0];
     }
     if(direction === "up"){
-        let input = element.previousSibling;
-        if(!input.classList.contains("movable-content")){
-            console.error("not movable");
-            return;
-        }
-        if(input.parentElement.parentElement.previousElementSibling){
-            console.log(input.parentElement.parentElement.previousSibling);
-            let target = element.parentElement.parentElement.previousSibling.childNodes[1].childNodes[0];
-            let previousValue = target.value
-            target.value = input.value
-            input.value = previousValue;
-        }
+        target = element?.parentElement?.parentElement?.previousSibling?.childNodes[1]?.childNodes[0];
     }
+    if(target){
+        let previousValue = target.value
+        target.value = input.value
+        input.value = previousValue;
+        return target;
+    }
+    else{
+        return null;
+    }
+}
+
+async function processTags(){
+    return await getProcessedTags(getTitle());
 }
 
 class displayHandler{

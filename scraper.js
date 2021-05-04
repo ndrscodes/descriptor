@@ -1,6 +1,5 @@
 
 class scraper{
-
     constructor(){
         this.corsProxy = "http://localhost:8080/";
         this.api = "https://api-v2.soundcloud.com";
@@ -26,7 +25,6 @@ class scraper{
 
     async getHtmlDocument(url){
         const result = await fetch(this.corsProxy + url, {headers: {'Content-Type': 'text/plain'}});
-        console.log(result.text());
         return result;
     }
 
@@ -66,7 +64,6 @@ class scraper{
 
     async getDisplayName(url){
         let page = await this.getViaProxy(url);
-        console.log(this.getElementByXPath(page, '//h1[contains(@itemprop, "name")]/a[contains(@itemprop, "url")]'));
         return this.getElementByXPath(page, '//h1[contains(@itemprop, "name")]/a[contains(@itemprop, "url")]').innerHTML;
     }
 
@@ -94,7 +91,6 @@ class scraper{
         }
         let parser = new DOMParser();
         let htmlPage = parser.parseFromString(html, 'text/html');
-        console.log(htmlPage.evaluate(xPathExpression, htmlPage, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue);
         return htmlPage.evaluate(xPathExpression, htmlPage, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     }
 
@@ -115,28 +111,30 @@ class scraper{
         return response;
     }
 
-    async getArtistLinks(url){
-        let result = [];
+    async getDescription(url){
         let page = await this.getViaProxy(url);
         let description = this.getElementByXPath(page, "//*[@id=\"app\"]/noscript[2]/article/p/text()").parentElement.textContent;
-        console.log(description);
-        const regex = /@(\S*)/gm;
-        let regexResult;
-        while((regexResult = regex.exec(description)) != null){
-            result.push("https://soundcloud.com/" + regexResult[1]);
-        }
-        return result.concat(await this.getArtistLinksDirect(url));
+        return description;
     }
 
-    async getArtistLinksDirect(url){
+    async getArtistLinks(url){
         let result = [];
-        let page = await this.getViaProxy(url);
-        let description = this.getElementByXPath(page, "//*[@id=\"app\"]/noscript[2]/article/p/text()").parentElement.textContent;
-        console.log(description);
-        const regex = /https?:\/\/soundcloud.com\/\S*/gm;
+        let description = await this.getDescription(url);
+        const regex = /(?:^|\s|[^a-zA-Z])@(\S*)/gm;
         let regexResult;
         while((regexResult = regex.exec(description)) != null){
-            result.push(regexResult[0]);
+            result.push(("https://soundcloud.com/" + regexResult[1]).toLowerCase());
+        }
+        result = result.concat(await this.getArtistLinksDirect(description));
+        return result.concat(("https://soundcloud.com" + await this.getOwner(url)).toLowerCase()).unique();
+    }
+
+    async getArtistLinksDirect(text){
+        let result = [];
+        const regex = /https?:\/\/soundcloud.com\/\S*/gm;
+        let regexResult;
+        while((regexResult = regex.exec(text)) != null){
+            result.push(regexResult[0].toLowerCase().replace("http:", "https:"));
         }
         return result;
     }
@@ -150,5 +148,10 @@ class scraper{
     async getSongTitle(url){
         let title = new DOMParser().parseFromString(await this.getViaProxy(url), 'text/html').querySelector("[itemprop=url]");
         return title.textContent;
+    }
+
+    async getOwner(url){
+        let owner = new DOMParser().parseFromString(await this.getViaProxy(url), 'text/html').querySelector("[itemprop=url]").nextElementSibling;
+        return owner.getAttribute("href");
     }
 }
