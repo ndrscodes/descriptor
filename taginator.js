@@ -30,8 +30,8 @@ async function getProcessedTags(search){
         }
     });
     let songArtistSplit = tagSearch.toLowerCase().split("-");
-    result.push(songArtistSplit[0].replace("& ", ""));
-    result.push(songArtistSplit[0].split("$ "));
+    result.push(songArtistSplit[0].replace(/&|x /gm, ""));
+    result.push(songArtistSplit[0].split(/&|x /gm));
     result.push(songArtistSplit);
     result.push(songArtistSplit[1].split(/feat\.?|ft\.?/gm));
     result.push(songArtistSplit[1].split(/feat\.?|ft\.?/gm).join(""));
