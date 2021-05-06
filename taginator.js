@@ -56,8 +56,8 @@ async function getProcessedTags(search){
     });
 
     let songArtistSplit = tagSearch.toLowerCase().split("-");
-    result.push(songArtistSplit[0].replace(/&|x /gm, ""));
-    let artists = songArtistSplit[0].split(/&|x /gm);
+    result.push(songArtistSplit[0].replace(/&|x|, /gm, ""));
+    let artists = songArtistSplit[0].split(/&|x|, /gm);
     result.push(artists);
 
     artists.forEach(element => {
