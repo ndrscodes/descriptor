@@ -122,7 +122,9 @@ class scraper{
         let description = await this.getDescription(url);
         const regex = /(?:^|\s|[^a-zA-Z])@(\S*[a-zA-Z])/gm;
         let regexResult;
+        console.log(description);
         while((regexResult = regex.exec(description)) != null && regexResult[1] != null){
+            console.log(regexResult);
             result.push(("https://soundcloud.com/" + regexResult[1]).toLowerCase());
         }
         result = result.concat(await this.getArtistLinksDirect(description));
@@ -131,7 +133,7 @@ class scraper{
 
     async getArtistLinksDirect(text){
         let result = [];
-        const regex = /(https?:\/\/soundcloud.com\/[a-zA-Z])*/gm;
+        const regex = /(https?:\/\/soundcloud.com\/[a-zA-Z\d]*)/gm;
         let regexResult;
         while((regexResult = regex.exec(text)) != null && regexResult[1] != undefined){
             result.push(regexResult[1].toLowerCase().replace("http:", "https:"));
