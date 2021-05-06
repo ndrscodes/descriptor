@@ -9,3 +9,12 @@ Array.prototype.unique = function() {
 
     return a;
 };
+
+String.prototype.containsAny = function(haystack) {
+    for(var i=0; i<haystack.length; i++){
+        if(this.includes(haystack[i])){
+            return true;
+        }
+    }
+    return false;
+};
