@@ -38,7 +38,7 @@ async function getProcessedTags(search){
                 if(!added && element.toString().toLowerCase().includes(str.toLowerCase())){
                     hitCount++;
                     console.log(element + " is a probable candidate: " + hitCount + " matches with title")
-                    if(hitCount >= search.length/3){
+                    if(hitCount >= searchItems.length/3){
                         console.log("found tag", element);
                         result.push(element);
                         added = true;
@@ -56,8 +56,8 @@ async function getProcessedTags(search){
     });
 
     let songArtistSplit = tagSearch.toLowerCase().split("-");
-    result.push(songArtistSplit[0].replace(/&|x|, /gm, ""));
-    let artists = songArtistSplit[0].split(/&|x|, /gm);
+    result.push(songArtistSplit[0].replace(/ &| x|, /gm, ""));
+    let artists = songArtistSplit[0].split(/ &| x|, /gm);
     result.push(artists);
 
     artists.forEach(element => {
