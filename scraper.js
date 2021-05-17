@@ -1,8 +1,8 @@
 
 class scraper{
     constructor(){
-        this.corsProxy = "http://localhost:8080/";
-        this.api = "https://api-v2.soundcloud.com";
+        this.corsProxy = config.proxy;
+        this.api = config.api;
         this.loadedWebPages = new Map();
         this.proxyLoadedWebPages = new Map();
         this.clientId = null;
