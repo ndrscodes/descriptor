@@ -107,9 +107,12 @@ async function getArtistBlock(artistId){
 async function autoFill(){
     let url = getSongUrl();
     let artistLinks = await itemScraper.getArtistLinks(url);
-    for(let i = 0; i < (await artistLinks).length; i++){
+    for(let i = 0; i < artistLinks.length; i++){
         if(i >= artistCount){
             addArtistField();
+        }
+        if(artistLinks.length < artistCount){
+            removeArtistField();
         }
         getArtistField(i).value = artistLinks[i];
     }
