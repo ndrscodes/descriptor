@@ -23,9 +23,9 @@ The script can be executed by simply passing it to node:
 node server.js
 ```
 
-You can also run this proxy on a different server. In case you do, do not forget to edit [scraper.js](scraper.js). Here, we need to exchange the value for corsProxy to point to our proxy (example given below):
+You can also run this proxy on a different server. In case you do, do not forget to edit [config.js](config.js). Here, we need to exchange the value for corsProxy to point to our proxy (example given below):
 ```
-this.corsProxy = "http://your-cors-pro.xy:8000/";
+proxy: "http://your-cors-pro.xy:8000/";
 ```
 
 If any of you guys are interested in creating a more stable solution for a broader audience, i'll gladly help you. Just create an issue or a pull request. Whatever floats your boat.
