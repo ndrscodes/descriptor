@@ -275,7 +275,7 @@ class displayHandler{
         const regex = /(?:.*\.)*([\w-]*)\.(?!uk)/gm; //parses a string for the second-to-last occurence between two dots -> gets a hosts domain
         let result;
         if((result = regex.exec(url)) != null && result.length > 1){
-            return this.capitalize(result[1]);
+            return this.replace("-", " ").capitalize(result[1]);
         }
         return null;
     }
