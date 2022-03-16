@@ -112,10 +112,11 @@ async function autoFill(){
         if(i >= artistCount){
             addArtistField();
         }
-        if(artistLinks.length < artistCount){
-            removeArtistField();
-        }
         getArtistField(i).value = artistLinks[i];
+    }
+    let r = artistCount - artistLinks.length;
+    for(let i = 0; i < r; i++){
+        removeArtistField();
     }
     setTitle(await itemScraper.getSongTitle(url));
     setDownloadLink(await itemScraper.getDownloadLink(url));
