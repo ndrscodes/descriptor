@@ -11,14 +11,15 @@ class scraper{
 
     async getViaProxy(url){
         if(this.proxyLoadedWebPages.get(url) == null){
-            this.proxyLoadedWebPages.set(url, await fetch(this.corsProxy + url, {headers: {'Content-Type': 'text/plain'}}).then(res => res.text()));
+            this.proxyLoadedWebPages.set(url, await fetch(this.corsProxy + url, {headers: {'Content-Type': 'text/plain'}})
+                .then(res => res.status == 200 ? res?.text() : null));
         }
         return this.proxyLoadedWebPages.get(url);
     }
 
     async get(url){
         if(this.loadedWebPages.get(url) == null){
-            this.loadedWebPages.set(url, await fetch(url, {headers: {'Content-Type': 'text/plain'}}).then(res => res.text()));
+            this.loadedWebPages.set(url, await fetch(url, {headers: {'Content-Type': 'text/plain'}}).then(res => res.status == 200 ? res?.text() : null));
         }
         return this.loadedWebPages.get(url);
     }
