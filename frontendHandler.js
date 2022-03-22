@@ -107,6 +107,10 @@ async function getArtistBlock(artistId){
 
 async function autoFill(){
     let url = getSongUrl();
+    let paramPos = url.indexOf("?");
+    if(url != null && url != undefined && paramPos >= 0){
+        url = url.substring(0, paramPos);
+    }
     let artistLinks = await itemScraper.getArtistLinks(url);
     for(let i = 0; i < artistLinks.length; i++){
         if(i >= artistCount){
@@ -285,6 +289,9 @@ class displayHandler{
     runReplacements(input){
         let result;
         result = input.replace("?sub_confirmation=1", "");
+        result = result.replace("Itunes_podcast", "iTunes");
+        result = result.replace("Itunes", "iTunes");
+        result = result.replace("Linktr", "Linktree");
         return result;
     }
 }
