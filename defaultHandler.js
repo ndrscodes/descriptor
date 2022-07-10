@@ -34,7 +34,7 @@ Snapchat: Jompahej
 
 \u279EEvery song named "JompaMusic Release" in title is copyright free &  can be used & monetized against proper cred such as iTunes, Spotify & free download link. 
 
-\u279EIntro made by Nils Bakker: E-mail: info@nilsbakker.nl
+\u279EIntro made by Nils Bakker.
 \u279ELogo made by: https://www.youtube.com/user/iFlipsfulGames`);
     map.set("wallpaper-header", "Picture URL \u1555( \u141B )\u1557:");
     return map;
